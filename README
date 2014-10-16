@@ -1,0 +1,14 @@
+This is the e-puck firmware used at the chair for data processing. It is based on
+GCtronic's default firmware (http://www.gctronic.com/doc/index.php/E-Puck), but
+focuses on the Overo interface and robot formation control.
+
+Instead of using the MPLAB IDE poject like GCtronicm, our version uses CMake for
+building and eclipse as IDE.
+
+The project assumes that you put it into a subdirectory of the "program"-folder
+of e-pucks SVN-tree. You can find these files on http://gna.org/projects/e-puck/
+
+To build the firmware, check toolchain-xc16-pic.cmake for the right path to the
+XC16 toolchain on your system and invoke cmake in the build subdirectory like
+this:
+    cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain-xc16-pic.cmake ..
