@@ -11,7 +11,7 @@ message(STATUS "Found bin2hex: ${XC16_BIN2HEX}")
 set(CMAKE_C_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mlarge-code -mlarge-data -O0 -fmessage-length=0")
 # The asm compiler is invoked via gcc, so we can just keep the flags. Otherwise, -mcpu would be mandatory
 set(CMAKE_ASM_FLAGS ${CMAKE_C_FLAGS})
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--heap=128,--stack=512,--report-mem,-Map=${CMAKE_PROJECT_NAME}.map,--script=/usr/local/share/microchip/xc16/v1.22/support/dsPIC30F/gld/p30F6014A.gld")
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--heap=128,--stack=512,--report-mem,-Map=${CMAKE_PROJECT_NAME}.map,--script=/usr/local/share/microchip/xc16/v1.25/support/dsPIC30F/gld/p30F6014A.gld")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 

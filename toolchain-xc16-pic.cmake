@@ -1,7 +1,7 @@
 # Specify search path for xc16 compiler
 set(XC16_SEARCH_PATH
-    /opt/microchip/xc16/v1.22
-    /usr/local/share/microchip/xc16/v1.22
+    /opt/microchip/xc16/v1.25
+    /usr/local/share/microchip/xc16/v1.25
     )
 
 # Mandatory target system name, e.g. "Linux", for embedded fw, use "Generic"
