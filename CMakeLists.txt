@@ -30,9 +30,9 @@ set(LDV-EPUCK-FW_SOURCES
     DataEEPROM.s
     runaccelerometer.c
     runbreitenberg_adv.c
+    rundetectsound.c
     rungrounddirection.c
     rungyroscope.c
-    runlocatesound.c
     runshow.c
     runsquare.c
     runwallfollow.c

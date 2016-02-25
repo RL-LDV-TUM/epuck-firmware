@@ -35,16 +35,16 @@ void run_translatorI2C() {
 	e_i2cp_init();
 
 	while (1) {
-		e_getchar_uart1(&mod);	// #module
+		e_getchar_uart1((char*)&mod);	// #module
 		mod=(unsigned char) (mod<<1);
-		e_getchar_uart1(&reg);	// #register
+		e_getchar_uart1((char*)&reg);	// #register
 		if (reg>127) {	// read
 			e_i2cp_enable();
 			val= e_i2cp_read(mod, reg&0x7f);	// read I2C
 			e_i2cp_disable();
-			e_send_uart1_char(&val, 1);
+			e_send_uart1_char((char*)&val, 1);
 		} else {	// write
-			e_getchar_uart1(&val);	// #value
+			e_getchar_uart1((char*)&val);	// #value
 			e_i2cp_enable();
 			e_i2cp_write(mod, reg, val);	// write I2C
 			e_i2cp_disable();
@@ -62,7 +62,7 @@ void run_translatorI2C() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void run_translatorI2C_b() {
-	unsigned char mod, reg, val;
+	unsigned char mod, reg;
 
 	uart_send_static_text("\f\a"
 	                      "WELCOME to the RS232 - I2C translator on e-Puck\r\n"
@@ -70,8 +70,8 @@ void run_translatorI2C_b() {
 	e_i2cp_init();
 
 	while (1) {
-		e_getchar_uart1(&mod);	// #module
-		e_getchar_uart1(&reg);	// #register
+		e_getchar_uart1((char*)&mod);	// #module
+		e_getchar_uart1((char*)&reg);	// #register
 		if (mod>127) {	// read
 		} else { //write
 		}

@@ -110,7 +110,7 @@ void run_CameraTurn() {
 		e_set_front_led(0);
 
 		while(!e_poxxxx_is_img_ready());	// wait end of capture
-		buf_ptr=&buffer[0];
+		buf_ptr=(unsigned char*)&buffer[0];
 		left=0; right=0; lightPos=0; lightest=0;
 		for (i=0; i<30; i++) {	//left
 			pixel=*buf_ptr;
@@ -194,7 +194,7 @@ void run_SensDispl() {
 			e_set_led(7,1);
 		while(!e_poxxxx_is_img_ready());	// wait end of capture
 		cam_light=0;
-		buf_ptr=&buffer[0];
+		buf_ptr=(unsigned char*)&buffer[0];
 		for (i=0; i<cam_size; i++) {
 			cam_light+=*buf_ptr;
 			buf_ptr++;
@@ -273,3 +273,4 @@ void run_DustCleaner() {
 		wait(20000);
 	}								
 }
+

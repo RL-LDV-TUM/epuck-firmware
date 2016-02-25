@@ -116,7 +116,7 @@ int run_asercom(void) {
                 "WELCOME to the SerCom protocol on e-Puck\r\n"
                 "the EPFL education robot type \"H\" for help\r\n");
     } else {
-         if(isEpuckVersion1_1()==0) {
+         if(isEpuckVersion1_3()==0) {
              e_acc_calibr();
          }
         uart2_send_static_text("\f\a"
@@ -264,7 +264,7 @@ int run_asercom(void) {
                             //accy = e_get_acc(1);
                             //accz = e_get_acc(2);
                         } else {
-                            if(isEpuckVersion1_1()) {
+                            if(isEpuckVersion1_3()) {
                                 accx = 0;
                                 accy = 0;
                                 accz = 0;
@@ -286,7 +286,7 @@ int run_asercom(void) {
                         if(use_bt) {
                             accelero = e_read_acc_spheric();
                         } else {
-                            if(isEpuckVersion1_1()) {
+                            if(isEpuckVersion1_3()) {
                                 accelero.acceleration = 0.0;
                                 accelero.inclination = 0.0;
                                 accelero.orientation = 0.0;
@@ -323,7 +323,7 @@ int run_asercom(void) {
                         break;
 
                     case 'b': // battery state
-                        if (isEpuckVersion1_1()) {
+                        if (isEpuckVersion1_3()) {
                             battValue = getBatteryValuePercentage();
                             buffer[i++] = battValue & 0xFF;
                             buffer[i++] = battValue << 8;
@@ -361,7 +361,7 @@ int run_asercom(void) {
                         break;
 
                     case 'g': // gyro rates
-                        if(use_bt && isEpuckVersion1_1()) {
+                        if(use_bt && isEpuckVersion1_3()) {
                             getAllAxesGyro(&gyrox, &gyroy, &gyroz);
                             buffer[i++] = gyrox & 0xFF;
                             buffer[i++] = gyrox >> 8;
@@ -466,6 +466,27 @@ int run_asercom(void) {
                             }
                         }
                         break;
+                        
+                    case 'P': // set motor position
+                        if (use_bt) {
+                            while (e_getchar_uart1(&c1) == 0);
+                            while (e_getchar_uart1(&c2) == 0);
+                        } else {
+                            while (e_getchar_uart2(&c1) == 0);
+                            while (e_getchar_uart2(&c2) == 0);
+                        }
+                        positionl = (unsigned char) c1 + ((unsigned int) c2 << 8);
+                        if (use_bt) {
+                            while (e_getchar_uart1(&c1) == 0);
+                            while (e_getchar_uart1(&c2) == 0);
+                        } else {
+                            while (e_getchar_uart2(&c1) == 0);
+                            while (e_getchar_uart2(&c2) == 0);
+                        }
+                        positionr = (unsigned char) c1 + ((unsigned int) c2 << 8);
+                        e_set_steps_left(positionl);
+                        e_set_steps_right(positionr);
+                        break;
                     case 'Q': // read encoders
                         n = e_get_steps_left();
                         buffer[i++] = n & 0xff;
@@ -476,7 +497,7 @@ int run_asercom(void) {
                         break;
 
                     case 't': // temperature
-                        if (use_bt && isEpuckVersion1_1()) {
+                        if (use_bt && isEpuckVersion1_3()) {
                             buffer[i++] = getTemperature();
                         } else {
                             buffer[i++] = 0;
@@ -506,6 +527,41 @@ int run_asercom(void) {
                         n = e_last_mic_scan_id; //send last scan
                         buffer[i++] = n & 0xff;
                         break;
+                    case 'W':
+                        if (use_bt) {
+                            while (e_getchar_uart1((char*)&mod)==0);
+                            while (e_getchar_uart1((char*)&reg)==0);
+                            while (e_getchar_uart1((char*)&val)==0);
+                            e_i2cp_enable();
+                            e_i2cp_write((char)mod, (char)reg, (char)val);	// write I2C
+                            e_i2cp_disable();
+                        }
+                        break;
+                    case 'w':	// RGB-panel extension command: write 9-LEDs + 8 IRs setting through I2C (RGB-panel I2C address = 176)
+                        if (use_bt) {
+                            e_i2cp_enable();
+                            for(j=0; j<24; j++) {
+                                while (e_getchar_uart1(&buffer[j])==0);
+                            }
+                            for(j=146; j<149; j++) {
+                                while (e_getchar_uart1(&buffer[j-122])==0);
+                            }
+                            for(j=164; j<172; j++) {
+                                while (e_getchar_uart1(&buffer[j-137])==0);
+                            }
+                            for(j=0; j<24; j++) {
+                                e_i2cp_write((unsigned char)176, (unsigned char)j, (unsigned char)buffer[j]);
+                            }
+                            for(j=146; j<149; j++) {
+                                e_i2cp_write((unsigned char)176, (unsigned char)j, (unsigned char)buffer[j-122]);
+                            }
+                            for(j=164; j<172; j++) {
+                                e_i2cp_write((unsigned char)176, (unsigned char)j, (unsigned char)buffer[j-137]);
+                            }
+                            e_i2cp_write((unsigned char)176, (unsigned char)145, (unsigned char)1);
+                            e_i2cp_disable();
+                        }
+			break;
                     default: // silently ignored
                         break;
                 }
@@ -557,7 +613,7 @@ int run_asercom(void) {
                     if(use_bt) {
                         sprintf(buffer, "a,%d,%d,%d\r\n", e_get_acc_filtered(0, 1), e_get_acc_filtered(1, 1), e_get_acc_filtered(2, 1));
                     } else {
-                        if(isEpuckVersion1_1()) {
+                        if(isEpuckVersion1_3()) {
                             sprintf(buffer, "a,0,0,0\r\n");
                         } else {
                             sprintf(buffer, "a,%d,%d,%d\r\n", e_get_acc_filtered(0, 1), e_get_acc_filtered(1, 1), e_get_acc_filtered(2, 1));
@@ -570,7 +626,7 @@ int run_asercom(void) {
                     }
                     break;
                 case 'b': // battery state
-                    if (isEpuckVersion1_1()) {
+                    if (isEpuckVersion1_3()) {
                         sprintf(buffer, "b,%d (%d%%)\r\n", getBatteryValueRaw(), getBatteryValuePercentage());
                     } else {
                         sprintf(buffer, "b,%d\r\n", BATT_LOW); // BATT_LOW=1 => battery ok, BATT_LOW=0 => battery<3.4V
@@ -635,7 +691,7 @@ int run_asercom(void) {
                     break;
 #endif
                 case 'g': // gyro rates
-                    if (use_bt && isEpuckVersion1_1()) {
+                    if (use_bt && isEpuckVersion1_3()) {
                         sprintf(buffer, "g,%d,%d,%d\r\n", getXAxisGyro(), getYAxisGyro(), getZAxisGyro());
                     } else {
                         sprintf(buffer, "g,0,0,0\r\n");
@@ -652,7 +708,7 @@ int run_asercom(void) {
                         uart1_send_static_text("\n");
                         uart1_send_static_text("\"A\"               Accelerometer\r\n");
                         uart1_send_static_text("\"B,#\"             Body led 0=off 1=on 2=inverse\r\n");
-                        if (isEpuckVersion1_1()) {
+                        if (isEpuckVersion1_3()) {
                             uart1_send_static_text("\"b\"               Battery value\r\n");
                         } else {
                             uart1_send_static_text("\"b\"               Battery state (1=ok, 0=low)\r\n");
@@ -664,7 +720,7 @@ int run_asercom(void) {
 #ifdef IR_RECEIVER
                         uart1_send_static_text("\"G\"               IR receiver\r\n");
 #endif
-                        if (isEpuckVersion1_1()) {
+                        if (isEpuckVersion1_3()) {
                             uart1_send_static_text("\"g\"               Gyro\r\n");
                         }
                         uart1_send_static_text("\"H\"               Help\r\n");
@@ -682,7 +738,7 @@ int run_asercom(void) {
                         uart1_send_static_text("\"R\"               Reset e-puck\r\n");
                         uart1_send_static_text("\"S\"               Stop e-puck and turn off leds\r\n");
                         uart1_send_static_text("\"T,#\"             Play sound 1-5 else stop sound\r\n");
-                        if (isEpuckVersion1_1()) {
+                        if (isEpuckVersion1_3()) {
                             uart1_send_static_text("\"t\"               Temperature\r\n");
                         }
                         uart1_send_static_text("\"U\"               Get microphone amplitude\r\n");
@@ -691,10 +747,10 @@ int run_asercom(void) {
                         uart1_send_static_text("\"Y\"               Read I2C val=(mod,reg)\r\n");
                     } else { // when working with the gumstix extension some commands are no more available
                         uart2_send_static_text("\n");
-                        if (isEpuckVersion1_1() == 0) {
+                        if (isEpuckVersion1_3() == 0) {
                             uart2_send_static_text("\"A\"       Accelerometer\r\n");
                         }
-                        if (isEpuckVersion1_1()) {
+                        if (isEpuckVersion1_3()) {
                             uart2_send_static_text("\"b\"       Battery value\r\n");
                         } else {
                             uart2_send_static_text("\"b\"       Battery state (1=ok, 0=low)\r\n");
@@ -929,7 +985,7 @@ int run_asercom(void) {
                     break;
 
                 case 't': // temperature
-                    if (use_bt && isEpuckVersion1_1()) {
+                    if (use_bt && isEpuckVersion1_3()) {
                         sprintf(buffer, "t,%d\r\n", getTemperature());
                     } else {
                         sprintf(buffer, "t,0\r\n");

@@ -1,6 +1,6 @@
 #ifndef _LOCATES
 #define _LOCATES
 
-void run_locatesound();
+void run_detectsound();
 
 #endif

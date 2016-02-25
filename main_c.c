@@ -35,7 +35,7 @@
 
 #include "memory.h"
 char buffer[BUFFER_SIZE];
-int selector;
+extern int selector;
 char c;
 
 #ifdef IR_RECIEVER
@@ -44,7 +44,6 @@ char c;
 #endif 
 #include "runaccelerometer.h"
 #include "runbreitenberg_adv.h"
-#include "runlocatesound.h"
 #include "runwallfollow.h"
 #include "rungrounddirection.h"
 #include <utility/utility.h>
@@ -53,6 +52,7 @@ char c;
 #include "translatorI2C.h"
 #include "rungyroscope.h"
 #include "runsquare.h"
+#include "rundetectsound.h"
 
 #define PI 3.14159265358979
 
@@ -90,7 +90,7 @@ int main() {
 	if (selector==0) {
 		run_accelerometer();
 	} else if (selector==1) {
-		run_locatesound();
+                run_detectsound();
 	} else if (selector==2) {
 		run_wallfollow();
 	} else if (selector==3) {
@@ -121,7 +121,7 @@ int main() {
 		e_init_uart2(BAUD230400);   // the gumstix communicate with the robot at 230400 bauds
 		run_asercom();
 
-	} else if (selector==11) {	//�BT configuration	
+	} else if (selector==11) {	// BT configuration	
 
 		 sprintf(buffer, "\f\a\n\n\rWELCOME to the protocol on e-Puck Bluetooth calibration");
 

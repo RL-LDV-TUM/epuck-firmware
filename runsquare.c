@@ -25,7 +25,7 @@ void run_square() {
     //e_init_uart2(BAUD230400); // for debug
     
     while(1) {
-        if(isEpuckVersion1_1() && useGyroFlag==1) {
+        if(isEpuckVersion1_3() && useGyroFlag==1) {
             switch(squareState) {
                 case 0: // set speed to go forward (square side)
                     e_set_speed_left(150);
