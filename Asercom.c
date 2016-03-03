@@ -53,7 +53,7 @@ extern char c;
 
 int run_asercom(void) {
     static char c1, c2, wait_cam = 0;
-    static int i, j, n, speedr, speedl, positionr, positionl, LED_nbr, LED_action, accx, accy, accz, sound, gyrox, gyroy, gyroz;
+    static int i, j, n, speedr, speedl, positionr, positionl, LED_nbr, LED_action, accx, accy, accz, sound, gyrox, gyroy, gyroz, stepsl, stepsr;
     static int cam_mode, cam_width, cam_heigth, cam_zoom, cam_size, cam_x1, cam_y1;
     static char first = 0;
     char *ptr;
@@ -605,10 +605,10 @@ int run_asercom(void) {
             }
             buffer[i++] = '\0';
 
-            if ((buffer[0] != 'b') && (buffer[0] != 'g')) {
+/*            if ((buffer[0] != 'b') && (buffer[0] != 'g')) {
                 buffer[0] = toupper(buffer[0]); // we also accept lowercase letters
             }
-            switch (buffer[0]) {
+*/            switch (buffer[0]) {
                 case 'A': // read accelerometer
                     if(use_bt) {
                         sprintf(buffer, "a,%d,%d,%d\r\n", e_get_acc_filtered(0, 1), e_get_acc_filtered(1, 1), e_get_acc_filtered(2, 1));
@@ -665,6 +665,16 @@ int run_asercom(void) {
                         uart2_send_static_text("d\r\n");
                     }
                     break;
+                case 'd': // drive n steps
+                	sscanf(buffer, "d,%d,%d\r", &stepsl, &stepsr);
+                	e_set_drive_steps_left(stepsl);
+                	e_set_drive_steps_right(stepsr);
+                	if (use_bt) {
+                		uart1_send_static_text("ds\r\n");
+                	} else {
+                		uart2_send_static_text("ds\r\n");
+                	}
+                	break;
                 case 'E': // read motor speed
                     sprintf(buffer, "e,%d,%d\r\n", speedl, speedr);
                     if (use_bt) {
